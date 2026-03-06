@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Love Calculator</title>
+
+  <!-- Inline favicon (so no /favicon.ico 404) -->
+  <link
+    rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='70'>❤</text></svg>"
+  />
+
+  <style>
+    body{
+      margin:0;
+      background:black;
+      font-family:Arial, sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      height:100vh;
+      overflow:hidden;
+    }
+
+    /* NAME */
+    .name{
+      margin-top:40px;
+      font-size:48px;
+      font-weight:bold;
+      color:pink;
+      text-align:center;
+      letter-spacing:6px;
+      text-shadow:0 0 20px hotpink;
+    }
+
+    .name span{
+      display:inline-block;
+      position:relative;
+      transition:transform 1s ease;
+    }
+
+    /* CALCULATOR */
+    .calculator{
+      margin-top:40px;
+      background:#ffd6e8;
+      padding:20px;
+      border-radius:20px;
+      box-shadow:0 0 30px hotpink;
+      z-index:10;
+    }
+
+    .display{
+      width:240px;
+      height:50px;
+      font-size:20px;
+      margin-bottom:10px;
+      padding:10px;
+      border:none;
+      border-radius:10px;
+      background:white;
+    }
+
+    /* BUTTON GRID */
+    .buttons{
+      display:grid;
+      grid-template-columns:repeat(4,60px);
+      gap:10px;
+    }
+
+    button{
+      height:55px;
+      border:none;
+      cursor:pointer;
+      font-size:18px;
+      color:white;
+      background:linear-gradient(145deg,#ff9ac9,#ff5fa8);
+      border-radius:16px; /* ✅ Fallback so it shows everywhere */
+      /* clip-path:path("M30 52 C-10 25 15 -5 30 15 C45 -5 70 25 30 52"); */ /* experimental */
+      box-shadow:0 0 10px hotpink inset,0 0 10px pink;
+    }
+
+    .equal{
+      background:linear-gradient(145deg,#3aa0ff,#0066ff);
+      box-shadow:0 0 10px #3aa0ff inset,0 0 15px #3aa0ff;
+    }
+
+    /* LOVE RAIN */
+    .love{
+      position:absolute;
+      top:90px;
+      color:pink;
+      font-size:22px;
+      pointer-events:none;
+      animation:fall linear forwards;
+    }
+
+    @keyframes fall{
+      to{
+        transform:translateY(420px);
+        opacity:0;
+      }
+    }
+
+    .blast{
+      position:absolute;
+      color:pink;
+      font-size:16px;
+      pointer-events:none;
+      animation:blast 0.8s linear forwards;
+    }
+
+    @keyframes blast{
+      to{
+        transform:translate(var(--x),var(--y));
+        opacity:0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="name" class="name"></div>
+
+  <div class="calculator">
+    <input id="display" class="display" type="text" readonly />
+
+    <div class="buttons">
+      <button onclick="press('7')">7</button>
+      <button onclick="press('8')">8</button>
+      <button onclick="press('9')">9</button>
+      <button onclick="press('/')">/</button>
+
+      <button onclick="press('4')">4</button>
+      <button onclick="press('5')">5</button>
+      <button onclick="press('6')">6</button>
+      <button onclick="press('*')">*</button>
+
+      <button onclick="press('1')">1</button>
+      <button onclick="press('2')">2</button>
+      <button onclick="press('3')">3</button>
+      <button onclick="press('-')">-</button>
+
+      <button onclick="press('0')">0</button>
+      <button onclick="press('.')">.</button>
+      <button onclick="calculate()" class="equal">=</button>
+      <button onclick="press('+')">+</button>
+
+      <button onclick="press('%')">% </button>
+      <button onclick="clearDisplay()">C</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+
+    const nameText = "MUBTASIMA AFRIN MOULI";
+    const nameDiv = document.getElementById("name");
+
+    nameText.split("").forEach(letter => {
+      const span = document.createElement("span");
+      if (letter === " ") {
+        span.innerHTML = "&nbsp;&nbsp;";
+      } else {
+        span.textContent = letter;
+      }
+      nameDiv.appendChild(span);
+    });
+
+    function press(v){
+      display.value += v;
+      nameChaos();
+    }
+
+    function clearDisplay(){
+      display.value = "";
+    }
+
+    function nameChaos(){
+      const letters = document.querySelectorAll("#name span");
+
+      letters.forEach(letter => {
+        let x = (Math.random()*800 - 400);
+        let y = (Math.random()*400 - 200);
+        letter.style.transform = `translate(${x}px,${y}px) rotate(${Math.random()*360}deg)`;
+      });
+
+      setTimeout(() => {
+        letters.forEach(letter => {
+          letter.style.transform = "translate(0,0) rotate(0)";
+        });
+      }, 1000);
+    }
+
+    function calculate(){
+      let exp = display.value;
+
+      if (exp === "1+=1"){
+        display.value = "Vindeshi tara";
+        loveRain();
+        return;
+      }
+
+      if (exp === "1+=0"){
+        display.value = "NAFIZ";
+        loveRain();
+        return;
+      }
+
+      try{
+        // basic guard so eval gets only math characters
+        if (!/^[\d+\-*/%. ]*$/.test(exp)) throw new Error("Invalid");
+        // eslint-disable-next-line no-eval
+        display.value = eval(exp);
+        loveRain();
+      } catch {
+        display.value = "Error";
+      }
+    }
+
+    function loveRain(){
+      for (let i=0; i<20; i++){
+        let love = document.createElement("div");
+        love.className = "love";
+        love.innerHTML = "❤";
+
+        love.style.left = (Math.random() * window.innerWidth) + "px";
+        love.style.animationDuration = (2 + Math.random()*2) + "s";
+
+        document.body.appendChild(love);
+
+        love.addEventListener("animationend", () => {
+          blast(love.offsetLeft, window.innerHeight - 120);
+          love.remove();
+        });
+      }
+    }
+
+    function blast(x,y){
+      for (let i=0; i<6; i++){
+        let b = document.createElement("div");
+        b.className = "blast";
+        b.innerHTML = "❤";
+
+        let dx = (Math.random()*200 - 100) + "px";
+        let dy = (Math.random()*-200) + "px";
+
+        b.style.left = x + "px";
+        b.style.top  = y + "px";
+
+        b.style.setProperty("--x", dx);
+        b.style.setProperty("--y", dy);
+
+        document.body.appendChild(b);
+        setTimeout(() => b.remove(), 800);
+      }
+    }
+  </script>
+
+</body>
+</html>
